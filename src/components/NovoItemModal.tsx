@@ -36,7 +36,7 @@ const NovoItemModal: React.FC<NovoItemModalProps> = ({ isOpen, onClose, onSucces
     setError('');
     setLoading(true);
     try {
-      await api.post(`/projetos/${projetoId}/itens`, {
+      await api.post(`/projetos/${projetoId}/itens-orcados`, {
         naturezaDespesaId: parseInt(naturezaId),
         descricao: descricao || null,
         quantidadeOrcada: parseFloat(quantidade.replace(',', '.')),

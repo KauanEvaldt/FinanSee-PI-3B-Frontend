@@ -39,6 +39,28 @@ const ProjetoDetalhes: React.FC = () => {
     if (id) fetchProjeto();
   }, [id]);
 
+  const handleDeleteItemOrcado = async (itemId: number) => {
+    if (!window.confirm('Tem certeza que deseja excluir este item orçado?')) return;
+    try {
+      await api.delete(`/itens-orcados/${itemId}`);
+      fetchProjeto();
+    } catch (err) {
+      console.error('Erro ao excluir item orçado:', err);
+      alert('Erro ao excluir item.');
+    }
+  };
+
+  const handleDeleteGasto = async (gastoId: number) => {
+    if (!window.confirm('Tem certeza que deseja excluir este gasto?')) return;
+    try {
+      await api.delete(`/gastos/${gastoId}`);
+      fetchProjeto();
+    } catch (err) {
+      console.error('Erro ao excluir gasto:', err);
+      alert('Erro ao excluir gasto.');
+    }
+  };
+
   const formatCurrency = (value: number) =>
     new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(value ?? 0);
 
@@ -239,7 +261,9 @@ const ProjetoDetalhes: React.FC = () => {
                       </td>
                       <td>
                         <div className={styles.actionBtns}>
-                          <button className={styles.iconBtn} title="Excluir"><Trash2 size={16} /></button>
+                          <button className={styles.iconBtn} title="Excluir" onClick={() => handleDeleteItemOrcado(item.id)}>
+                            <Trash2 size={16} />
+                          </button>
                         </div>
                       </td>
                     </tr>
@@ -291,7 +315,9 @@ const ProjetoDetalhes: React.FC = () => {
                       <td>{gasto.fornecedor || '-'}</td>
                       <td>
                         <div className={styles.actionBtns}>
-                          <button className={styles.iconBtn} title="Excluir"><Trash2 size={16} /></button>
+                          <button className={styles.iconBtn} title="Excluir" onClick={() => handleDeleteGasto(gasto.id)}>
+                            <Trash2 size={16} />
+                          </button>
                         </div>
                       </td>
                     </tr>
