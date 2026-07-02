@@ -177,7 +177,7 @@ const ProjetoDetalhes: React.FC = () => {
                       <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f1f5f9" />
                       <XAxis dataKey="name" tick={{ fontSize: 11 }} tickLine={false} axisLine={false} />
                       <YAxis tickFormatter={v => `${(v/1000).toFixed(0)}k`} tick={{ fontSize: 11 }} tickLine={false} axisLine={false} />
-                      <Tooltip formatter={(v: number) => formatCurrency(v)} />
+                      <Tooltip formatter={(v: any) => formatCurrency(v)} />
                       <Legend iconType="circle" />
                       <Bar dataKey="Orçado" fill={CUSTEIO_COLOR} radius={[4, 4, 0, 0]} barSize={20} />
                       <Bar dataKey="Realizado" fill="#4ade80" radius={[4, 4, 0, 0]} barSize={20} />
@@ -198,7 +198,7 @@ const ProjetoDetalhes: React.FC = () => {
                         <Cell fill={CUSTEIO_COLOR} />
                         <Cell fill={CAPITAL_COLOR} />
                       </Pie>
-                      <Tooltip formatter={(v: number) => formatCurrency(v)} />
+                      <Tooltip formatter={(v: any) => formatCurrency(v)} />
                       <Legend iconType="circle" />
                     </PieChart>
                   </ResponsiveContainer>
@@ -220,7 +220,7 @@ const ProjetoDetalhes: React.FC = () => {
                     <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f1f5f9" />
                     <XAxis dataKey="name" tick={{ fontSize: 11 }} tickLine={false} axisLine={false} />
                     <YAxis tickFormatter={v => `${(v/1000).toFixed(0)}k`} tick={{ fontSize: 11 }} tickLine={false} axisLine={false} />
-                    <Tooltip formatter={(v: number) => formatCurrency(v)} />
+                    <Tooltip formatter={(v: any) => formatCurrency(v)} />
                     <Legend iconType="circle" />
                     <Line type="monotone" dataKey="Orçado" stroke={CUSTEIO_COLOR} strokeWidth={2.5} dot={{ r: 3 }} />
                     <Line type="monotone" dataKey="Realizado" stroke="#94a3b8" strokeWidth={2.5} dot={{ r: 3 }} />

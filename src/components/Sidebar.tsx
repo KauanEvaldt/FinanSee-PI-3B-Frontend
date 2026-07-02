@@ -5,9 +5,6 @@ import {
   FolderOpen, 
   BarChart3, 
   Settings, 
-  Plus, 
-  Receipt, 
-  PlusCircle, 
   LogOut 
 } from 'lucide-react';
 import { useNavigate, useLocation } from 'react-router-dom';

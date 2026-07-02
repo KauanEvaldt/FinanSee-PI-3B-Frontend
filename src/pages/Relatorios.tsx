@@ -144,7 +144,7 @@ const Relatorios: React.FC = () => {
                       <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#eee" />
                       <XAxis dataKey="name" tick={{ fill: '#64748b' }} tickLine={false} axisLine={false} />
                       <YAxis tickFormatter={(value) => `R$ ${value / 1000}k`} tick={{ fill: '#64748b' }} tickLine={false} axisLine={false} />
-                      <Tooltip formatter={(value: number) => formatCurrency(value)} />
+                      <Tooltip formatter={(value: any) => formatCurrency(value)} />
                       <Legend />
                       <Line type="monotone" dataKey="Orcado" stroke="#94a3b8" strokeWidth={3} dot={{ r: 4 }} activeDot={{ r: 6 }} name="Orçamento Acumulado" />
                       <Line type="monotone" dataKey="Realizado" stroke="#3b82f6" strokeWidth={3} dot={{ r: 4 }} activeDot={{ r: 6 }} name="Gasto Acumulado" />
