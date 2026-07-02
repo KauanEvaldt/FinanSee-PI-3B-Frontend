@@ -8,9 +8,10 @@ interface NovoItemModalProps {
   onClose: () => void;
   onSuccess: () => void;
   projetoId: string | number;
+  initialData?: any;
 }
 
-const NovoItemModal: React.FC<NovoItemModalProps> = ({ isOpen, onClose, onSuccess, projetoId }) => {
+const NovoItemModal: React.FC<NovoItemModalProps> = ({ isOpen, onClose, onSuccess, projetoId, initialData }) => {
   const [naturezas, setNaturezas] = useState<any[]>([]);
   const [naturezaId, setNaturezaId] = useState('');
   const [descricao, setDescricao] = useState('');
@@ -24,8 +25,18 @@ const NovoItemModal: React.FC<NovoItemModalProps> = ({ isOpen, onClose, onSucces
   useEffect(() => {
     if (isOpen) {
       api.get('/catalogos/naturezas').then(res => setNaturezas(res.data)).catch(console.error);
+      
+      if (initialData) {
+        setNaturezaId(initialData.naturezaDespesaId?.toString() || '');
+        setDescricao(initialData.descricao || '');
+        setQuantidade(initialData.quantidadeOrcada?.toString() || '');
+        setValorUnitario(initialData.valorUnitarioOrcado?.toString() || '');
+      } else {
+        setNaturezaId(''); setDescricao(''); setQuantidade(''); setValorUnitario('');
+      }
+      setError('');
     }
-  }, [isOpen]);
+  }, [isOpen, initialData]);
 
   const reset = () => {
     setNaturezaId(''); setDescricao(''); setQuantidade(''); setValorUnitario(''); setError('');
@@ -36,24 +47,31 @@ const NovoItemModal: React.FC<NovoItemModalProps> = ({ isOpen, onClose, onSucces
     setError('');
     setLoading(true);
     try {
-      await api.post(`/projetos/${projetoId}/itens-orcados`, {
+      const payload = {
         naturezaDespesaId: parseInt(naturezaId),
         descricao: descricao || null,
-        quantidadeOrcada: parseFloat(quantidade.replace(',', '.')),
-        valorUnitarioOrcado: parseFloat(valorUnitario.replace(',', '.')),
-      });
+        quantidadeOrcada: parseFloat(quantidade.toString().replace(',', '.')),
+        valorUnitarioOrcado: parseFloat(valorUnitario.toString().replace(',', '.')),
+      };
+      
+      if (initialData?.id) {
+        await api.put(`/itens-orcados/${initialData.id}`, payload);
+      } else {
+        await api.post(`/projetos/${projetoId}/itens-orcados`, payload);
+      }
+      
       onSuccess();
       onClose();
       reset();
     } catch (err: any) {
-      setError(err.response?.data?.title || err.response?.data?.message || 'Erro ao criar item.');
+      setError(err.response?.data?.title || err.response?.data?.message || `Erro ao ${initialData ? 'editar' : 'criar'} item.`);
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <Modal isOpen={isOpen} onClose={() => { onClose(); reset(); }} title="Criar Novo Item">
+    <Modal isOpen={isOpen} onClose={() => { onClose(); reset(); }} title={initialData ? "Editar Item" : "Criar Novo Item"}>
       <form onSubmit={handleSubmit} className={styles.form}>
         {error && <div className={styles.error}>{error}</div>}
 

@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Sidebar from '../components/Sidebar';
 import NovoProjetoModal from '../components/NovoProjetoModal';
-import { Plus, Search } from 'lucide-react';
+import { Plus, Search, Edit } from 'lucide-react';
 import api from '../services/api';
 import styles from './Projetos.module.css';
 
@@ -10,6 +10,7 @@ const Projetos: React.FC = () => {
   const [projetos, setProjetos] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [editProjeto, setEditProjeto] = useState<any>(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [filterStatus, setFilterStatus] = useState<'todos' | 'em_andamento' | 'concluido' | 'alerta'>('todos');
   const navigate = useNavigate();
@@ -112,6 +113,14 @@ const Projetos: React.FC = () => {
                       <div key={proj.id} className={styles.projetoCard}>
                         <div className={styles.cardTop}>
                           <span className={`${styles.statusBadge} ${cls}`}>{text}</span>
+                          <button
+                            className={styles.iconBtn}
+                            onClick={(e) => { e.stopPropagation(); setEditProjeto(proj); setIsModalOpen(true); }}
+                            title="Editar Projeto"
+                            style={{ padding: 0, color: 'var(--color-text-light)', border: 'none', background: 'transparent', cursor: 'pointer' }}
+                          >
+                            <Edit size={16} />
+                          </button>
                         </div>
                         <h3 className={styles.cardTitle}>{proj.titulo}</h3>
                         {proj.numeroEdital && <p className={styles.cardEdital}>{proj.numeroEdital}</p>}
@@ -146,6 +155,14 @@ const Projetos: React.FC = () => {
                     <div key={proj.id} className={`${styles.projetoCard} ${styles.projetoCardConcluido}`}>
                       <div className={styles.cardTop}>
                         <span className={`${styles.statusBadge} ${styles.statusSuccess}`}>Concluído</span>
+                        <button
+                          className={styles.iconBtn}
+                          onClick={(e) => { e.stopPropagation(); setEditProjeto(proj); setIsModalOpen(true); }}
+                          title="Editar Projeto"
+                          style={{ padding: 0, color: 'var(--color-text-light)', border: 'none', background: 'transparent', cursor: 'pointer' }}
+                        >
+                          <Edit size={16} />
+                        </button>
                       </div>
                       <h3 className={styles.cardTitle}>{proj.titulo}</h3>
                       {proj.numeroEdital && <p className={styles.cardEdital}>{proj.numeroEdital}</p>}
@@ -179,8 +196,9 @@ const Projetos: React.FC = () => {
 
       <NovoProjetoModal
         isOpen={isModalOpen}
-        onClose={() => setIsModalOpen(false)}
-        onSuccess={() => { setIsModalOpen(false); fetchProjetos(); }}
+        onClose={() => { setIsModalOpen(false); setEditProjeto(null); }}
+        onSuccess={() => { setIsModalOpen(false); setEditProjeto(null); fetchProjetos(); }}
+        initialData={editProjeto}
       />
     </div>
   );

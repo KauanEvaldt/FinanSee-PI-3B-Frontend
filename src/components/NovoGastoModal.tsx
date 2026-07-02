@@ -9,9 +9,10 @@ interface NovoGastoModalProps {
   onSuccess: () => void;
   projetoId: string | number;
   itensOrcados: any[];
+  initialData?: any;
 }
 
-const NovoGastoModal: React.FC<NovoGastoModalProps> = ({ isOpen, onClose, onSuccess, projetoId, itensOrcados }) => {
+const NovoGastoModal: React.FC<NovoGastoModalProps> = ({ isOpen, onClose, onSuccess, projetoId, itensOrcados, initialData }) => {
   const [naturezas, setNaturezas] = useState<any[]>([]);
   const [itemOrcadoId, setItemOrcadoId] = useState('');
   const [naturezaId, setNaturezaId] = useState('');
@@ -26,13 +27,30 @@ const NovoGastoModal: React.FC<NovoGastoModalProps> = ({ isOpen, onClose, onSucc
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
-  const valorTotal = (parseFloat(quantidade.replace(',', '.')) || 0) * (parseFloat(valorUnitario.replace(',', '.')) || 0);
+  const valorTotal = (parseFloat(quantidade.toString().replace(',', '.')) || 0) * (parseFloat(valorUnitario.toString().replace(',', '.')) || 0);
 
   useEffect(() => {
     if (isOpen) {
       api.get('/catalogos/naturezas').then(res => setNaturezas(res.data)).catch(console.error);
+
+      if (initialData) {
+        setItemOrcadoId(initialData.itemOrcadoId?.toString() || '');
+        setNaturezaId(initialData.naturezaDespesaId?.toString() || '');
+        setDataDespesa(initialData.dataDespesa ? String(initialData.dataDespesa).split('T')[0] : '');
+        setQuantidade(initialData.quantidadeRealizada?.toString() || '');
+        setValorUnitario(initialData.valorUnitarioRealizado?.toString() || '');
+        setNumeroDocumento(initialData.numeroDocumento || '');
+        setFornecedor(initialData.fornecedor || '');
+        setObservacao(initialData.observacao || '');
+        setJustificativa(initialData.justificativa || '');
+      } else {
+        setItemOrcadoId(''); setNaturezaId(''); setDataDespesa('');
+        setQuantidade(''); setValorUnitario(''); setNumeroDocumento('');
+        setFornecedor(''); setObservacao(''); setJustificativa('');
+      }
+      setError('');
     }
-  }, [isOpen]);
+  }, [isOpen, initialData]);
 
   const reset = () => {
     setItemOrcadoId(''); setNaturezaId(''); setDataDespesa('');
@@ -45,29 +63,36 @@ const NovoGastoModal: React.FC<NovoGastoModalProps> = ({ isOpen, onClose, onSucc
     setError('');
     setLoading(true);
     try {
-      await api.post(`/projetos/${projetoId}/gastos`, {
+      const payload = {
         itemOrcadoId: itemOrcadoId ? parseInt(itemOrcadoId) : null,
         naturezaDespesaId: !itemOrcadoId && naturezaId ? parseInt(naturezaId) : null,
         dataDespesa,
-        quantidadeRealizada: parseFloat(quantidade.replace(',', '.')),
-        valorUnitarioRealizado: parseFloat(valorUnitario.replace(',', '.')),
+        quantidadeRealizada: parseFloat(quantidade.toString().replace(',', '.')),
+        valorUnitarioRealizado: parseFloat(valorUnitario.toString().replace(',', '.')),
         numeroDocumento: numeroDocumento || null,
         fornecedor: fornecedor || null,
         observacao: observacao || null,
         justificativa: justificativa || null,
-      });
+      };
+
+      if (initialData?.id) {
+        await api.put(`/gastos/${initialData.id}`, payload);
+      } else {
+        await api.post(`/projetos/${projetoId}/gastos`, payload);
+      }
+
       onSuccess();
       onClose();
       reset();
     } catch (err: any) {
-      setError(err.response?.data?.title || err.response?.data?.message || 'Erro ao registrar gasto.');
+      setError(err.response?.data?.title || err.response?.data?.message || `Erro ao ${initialData ? 'editar' : 'registrar'} gasto.`);
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <Modal isOpen={isOpen} onClose={() => { onClose(); reset(); }} title="Registrar Novo Gasto">
+    <Modal isOpen={isOpen} onClose={() => { onClose(); reset(); }} title={initialData ? "Editar Gasto" : "Registrar Novo Gasto"}>
       <form onSubmit={handleSubmit} className={styles.form}>
         {error && <div className={styles.error}>{error}</div>}
 

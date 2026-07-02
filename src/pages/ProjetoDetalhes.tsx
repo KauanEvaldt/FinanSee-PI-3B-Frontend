@@ -10,6 +10,7 @@ import {
 } from 'recharts';
 import NovoItemModal from '../components/NovoItemModal';
 import NovoGastoModal from '../components/NovoGastoModal';
+import NovoProjetoModal from '../components/NovoProjetoModal';
 import styles from './ProjetoDetalhes.module.css';
 
 const CUSTEIO_COLOR = '#1a3a6e';
@@ -23,6 +24,10 @@ const ProjetoDetalhes: React.FC = () => {
   const [activeTab, setActiveTab] = useState<'visao_geral' | 'orcados' | 'realizados'>('visao_geral');
   const [isItemModalOpen, setIsItemModalOpen] = useState(false);
   const [isGastoModalOpen, setIsGastoModalOpen] = useState(false);
+  const [isProjetoModalOpen, setIsProjetoModalOpen] = useState(false);
+  
+  const [editItem, setEditItem] = useState<any>(null);
+  const [editGasto, setEditGasto] = useState<any>(null);
 
   const fetchProjeto = async () => {
     try {
@@ -115,7 +120,9 @@ const ProjetoDetalhes: React.FC = () => {
               <p className={styles.subtitle}>Edital: {projeto.numeroEdital || 'N/A'} &nbsp;|&nbsp; Início: {projeto.dataInicio}</p>
             </div>
           </div>
-          <button className={styles.btnSecondary}><Edit size={18} /> Editar</button>
+          <button className={styles.btnSecondary} onClick={() => setIsProjetoModalOpen(true)}>
+            <Edit size={18} /> Editar
+          </button>
         </header>
 
         <div className={styles.tabs}>
@@ -261,6 +268,9 @@ const ProjetoDetalhes: React.FC = () => {
                       </td>
                       <td>
                         <div className={styles.actionBtns}>
+                          <button className={styles.iconBtn} title="Editar" onClick={() => { setEditItem(item); setIsItemModalOpen(true); }}>
+                            <Edit size={16} />
+                          </button>
                           <button className={styles.iconBtn} title="Excluir" onClick={() => handleDeleteItemOrcado(item.id)}>
                             <Trash2 size={16} />
                           </button>
@@ -315,6 +325,9 @@ const ProjetoDetalhes: React.FC = () => {
                       <td>{gasto.fornecedor || '-'}</td>
                       <td>
                         <div className={styles.actionBtns}>
+                          <button className={styles.iconBtn} title="Editar" onClick={() => { setEditGasto(gasto); setIsGastoModalOpen(true); }}>
+                            <Edit size={16} />
+                          </button>
                           <button className={styles.iconBtn} title="Excluir" onClick={() => handleDeleteGasto(gasto.id)}>
                             <Trash2 size={16} />
                           </button>
@@ -342,18 +355,26 @@ const ProjetoDetalhes: React.FC = () => {
 
       {projeto && (
         <>
+          <NovoProjetoModal
+            isOpen={isProjetoModalOpen}
+            onClose={() => { setIsProjetoModalOpen(false); }}
+            onSuccess={() => { setIsProjetoModalOpen(false); fetchProjeto(); }}
+            initialData={projeto}
+          />
           <NovoItemModal
             isOpen={isItemModalOpen}
-            onClose={() => setIsItemModalOpen(false)}
-            onSuccess={() => { setIsItemModalOpen(false); fetchProjeto(); }}
+            onClose={() => { setIsItemModalOpen(false); setEditItem(null); }}
+            onSuccess={() => { setIsItemModalOpen(false); setEditItem(null); fetchProjeto(); }}
             projetoId={projeto.id}
+            initialData={editItem}
           />
           <NovoGastoModal
             isOpen={isGastoModalOpen}
-            onClose={() => setIsGastoModalOpen(false)}
-            onSuccess={() => { setIsGastoModalOpen(false); fetchProjeto(); }}
+            onClose={() => { setIsGastoModalOpen(false); setEditGasto(null); }}
+            onSuccess={() => { setIsGastoModalOpen(false); setEditGasto(null); fetchProjeto(); }}
             projetoId={projeto.id}
             itensOrcados={projeto.itensOrcados || []}
+            initialData={editGasto}
           />
         </>
       )}
